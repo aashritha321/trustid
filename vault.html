@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TrustPass – Universal KYC & Academic Vault</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+    background: linear-gradient(135deg,#141e30,#243b55);
+    color:white;
+    font-family:Segoe UI;
+}
+.glass{
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    border-radius:15px;
+    padding:25px;
+    margin-bottom:25px;
+}
+.section-title{
+    color:#00e0ff;
+    font-weight:600;
+    margin-bottom:15px;
+}
+.btn-premium{
+    background:#00e0ff;
+    border:none;
+    font-weight:600;
+}
+.btn-premium:hover{
+    background:#00bcd4;
+}
+.small-text{
+    font-size:13px;
+}
+.progress{
+    height:22px;
+}
+</style>
+</head>
+
+<body>
+
+<script>
+if (localStorage.getItem("isLoggedIn") !== "true") {
+    alert("Please login first!");
+    window.location.href = "login.html";
+}
+</script>
+
+<div class="container py-5">
+
+<h2 class="text-center mb-4">🔐 TrustPass – Universal Digital Vault</h2>
+
+<div class="glass">
+<div class="section-title">📊 Profile Completion</div>
+<div class="progress">
+<div id="progressBar" class="progress-bar bg-info" style="width:0%">0%</div>
+</div>
+</div>
+
+<div class="glass">
+<div class="section-title">🔐 Master Consent</div>
+<div class="form-check">
+<input class="form-check-input" type="checkbox" id="masterConsent">
+<label class="form-check-label">
+I agree to securely store my encrypted personal data.
+</label>
+</div>
+</div>
+
+<div class="glass">
+<div class="section-title">🧾 Personal Details</div>
+<div id="personalFields"></div>
+</div>
+
+<div class="glass">
+<div class="section-title">🏠 Address Details</div>
+<div id="addressFields"></div>
+</div>
+
+<div class="glass">
+<div class="section-title">📞 Contact Details</div>
+<div id="contactFields"></div>
+</div>
+
+<div class="glass">
+<div class="section-title">🆔 Identity Details</div>
+<div id="identityFields"></div>
+</div>
+
+<div class="glass">
+<div class="section-title">💼 Occupation Details</div>
+<div id="occupationFields"></div>
+</div>
+
+<div class="glass">
+<div class="section-title">🎓 Academic Details</div>
+<div id="educationFields"></div>
+</div>
+
+<!-- BUTTON SECTION (FIXED LAYOUT) -->
+<div class="text-center mt-4">
+<div class="d-flex justify-content-center gap-3 flex-wrap">
+
+<button class="btn btn-premium px-4 py-2" onclick="saveData()">
+Save Securely
+</button>
+
+<button class="btn btn-outline-light px-4" onclick="goHome()">
+🏠 Home
+</button>
+
+<button class="btn btn-outline-danger px-4" onclick="clearVault()">
+Clear Vault
+</button>
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+/* ---------- FIELD CONFIG ---------- */
+
+const fields = {
+personal: [
+["fullName","Full Name"],
+["dob","Date of Birth","date"],
+["gender","Gender","select",["Male","Female","Other"]],
+["parentName","Father / Mother Name"],
+["maritalStatus","Marital Status","select",["Single","Married","Divorced","Widowed"]],
+["nationality","Nationality"]
+],
+address: [
+["currentAddress","Current Address","textarea"],
+["permanentAddress","Permanent Address","textarea"],
+["city","City"],
+["state","State"],
+["pincode","PIN Code"],
+["country","Country"]
+],
+contact: [
+["mobile","Mobile Number"],
+["email","Email","email"]
+],
+identity: [
+["aadhaarNumber","Aadhaar Number"],
+["panNumber","PAN Number"]
+],
+occupation: [
+["occupation","Occupation","select",["Student","Salaried","Self-employed","Business","Other"]],
+["companyName","Company Name"],
+["incomeRange","Annual Income","select",["Below 2 Lakhs","2-5 Lakhs","5-10 Lakhs","10-25 Lakhs","Above 25 Lakhs"]]
+],
+education: [
+["tenthBoard","10th Board"],
+["tenthMarks","10th Percentage"],
+["tenthYear","10th Year"],
+["twelfthBoard","12th Board"],
+["twelfthMarks","12th Percentage"],
+["twelfthYear","12th Year"],
+["stream","Stream","select",["Science","Commerce","Arts"]],
+["examName","Entrance Exam","select",["JEE Main","JEE Advanced","CET","NEET","Other"]],
+["examRank","Entrance Rank"],
+["category","Category","select",["General","OBC","SC","ST","EWS"]],
+["disability","Disability","select",["No","Yes"]]
+]
+};
+
+/* ---------- GENERATE FIELDS ---------- */
+
+function generateFields(section, containerId){
+const container=document.getElementById(containerId);
+fields[section].forEach(field=>{
+let [id,label,type,options]=field;
+let inputHTML="";
+
+if(type==="textarea"){
+inputHTML=`<textarea id="${id}" class="form-control mb-1" placeholder="${label}"></textarea>`;
+}
+else if(type==="select"){
+inputHTML=`<select id="${id}" class="form-select mb-1">
+<option value="">${label}</option>
+${options.map(o=>`<option>${o}</option>`).join("")}
+</select>`;
+}
+else{
+let inputType=type?type:"text";
+inputHTML=`<input type="${inputType}" id="${id}" class="form-control mb-1" placeholder="${label}">`;
+}
+
+container.innerHTML+=inputHTML+`
+<div class="form-check mb-2">
+<input class="form-check-input consent-check" type="checkbox" id="consent_${id}" checked>
+<label class="form-check-label small-text">Allow Auto-fill</label>
+</div>
+`;
+});
+}
+
+generateFields("personal","personalFields");
+generateFields("address","addressFields");
+generateFields("contact","contactFields");
+generateFields("identity","identityFields");
+generateFields("occupation","occupationFields");
+generateFields("education","educationFields");
+
+/* ---------- PROGRESS ---------- */
+
+function updateProgress(){
+let filled=0,total=0;
+document.querySelectorAll("input,select,textarea").forEach(el=>{
+if(el.type!=="checkbox"){
+total++;
+if(el.value.trim()!=="") filled++;
+}
+});
+let percent = total === 0 ? 0 : Math.round((filled/total)*100);
+let bar=document.getElementById("progressBar");
+bar.style.width=percent+"%";
+bar.innerText=percent+"%";
+}
+
+document.addEventListener("input",updateProgress);
+
+/* ---------- ENCRYPTION ---------- */
+
+function encrypt(data){ return btoa(JSON.stringify(data)); }
+function decrypt(data){ return JSON.parse(atob(data)); }
+
+/* ---------- SAVE ---------- */
+
+function saveData(){
+
+if(!document.getElementById("masterConsent").checked){
+alert("Please accept consent first.");
+return;
+}
+
+let data={}, consent={};
+
+document.querySelectorAll("input,select,textarea").forEach(el=>{
+if(el.id && !el.id.startsWith("consent_") && el.type!=="checkbox"){
+data[el.id]=el.value;
+}
+});
+
+document.querySelectorAll(".consent-check").forEach(c=>{
+consent[c.id]=c.checked;
+});
+
+localStorage.setItem("secureVault",encrypt({data,consent}));
+
+alert("Data Encrypted & Saved 🔐");
+
+// Redirect properly
+window.location.href="index.html";
+}
+
+/* ---------- LOAD ---------- */
+
+window.onload=function(){
+let saved=localStorage.getItem("secureVault");
+if(saved){
+let vault=decrypt(saved);
+let data=vault.data;
+let consent=vault.consent;
+
+for(let key in data){
+if(consent["consent_"+key]){
+let element = document.getElementById(key);
+if(element) element.value=data[key];
+}
+if(document.getElementById("consent_"+key)){
+document.getElementById("consent_"+key).checked=consent["consent_"+key];
+}
+}
+updateProgress();
+}
+}
+
+/* ---------- CLEAR ---------- */
+
+function clearVault(){
+localStorage.removeItem("secureVault");
+alert("Vault Cleared");
+location.reload();
+}
+
+/* ---------- HOME ---------- */
+
+function goHome(){
+window.location.href="index.html";
+}
+
+updateProgress();
+
+</script>
+
+</body>
+</html>

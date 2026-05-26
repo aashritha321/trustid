@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login - TRUSTID</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      :root {
+        --primary-dark: #0b2c4a;
+        --primary-blue: #114e82;
+        --accent-blue: #1f75fe;
+        --light-blue: #3fa9f5;
+        --white: #ffffff;
+      }
+
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: "Segoe UI", sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--primary-dark),
+          var(--primary-blue)
+        );
+        overflow: hidden;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(15px);
+        padding: 50px 40px;
+        border-radius: 25px;
+        width: 350px;
+        text-align: center;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        color: white;
+      }
+
+      h2 {
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+
+      .subtitle {
+        font-size: 14px;
+        opacity: 0.8;
+        margin-bottom: 30px;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border-radius: 30px;
+        border: none;
+        outline: none;
+        padding-left: 20px;
+        font-size: 14px;
+      }
+
+      input:focus {
+        box-shadow: 0 0 0 2px var(--light-blue);
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        border-radius: 30px;
+        border: none;
+        background: var(--accent-blue);
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        background: var(--light-blue);
+        transform: translateY(-2px);
+      }
+
+      .error {
+        color: #ff6b6b;
+        font-size: 13px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <h2>TRUSTID</h2>
+      <p class="subtitle">Secure Digital Identity Platform</p>
+
+      <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
+
+      <button onclick="login()">Login</button>
+      <p id="error" class="error"></p>
+    </div>
+
+    <script>
+      function login() {
+        const user = document.getElementById("username").value.trim();
+        const pass = document.getElementById("password").value.trim();
+
+        // Get stored users from localStorage
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+
+        // Check if username & password match
+        const validUser = users.find(function (u) {
+          return u.username === user && u.password === pass;
+        });
+
+        if (validUser) {
+          // ✅ Save login status
+          localStorage.setItem("isLoggedIn", "true");
+
+          // ✅ Save current logged in username
+          localStorage.setItem("currentUser", validUser.username);
+
+          // Clear any old error
+          document.getElementById("error").innerText = "";
+
+          // Redirect to main page
+          window.location.href = "index.html";
+        } else {
+          document.getElementById("error").innerText =
+            "Invalid Username or Password!";
+        }
+      }
+    </script>
+  </body>
+</html>

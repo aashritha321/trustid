@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Up - TRUSTID</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0B2C4A, #114E82);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            padding: 50px 40px;
+            border-radius: 25px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            color: white;
+        }
+
+        h2 {
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 30px;
+            border: none;
+            padding-left: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 30px;
+            border: none;
+            background: #1F75FE;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #3FA9F5;
+        }
+
+        .error {
+            color: #ff6b6b;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>Create Account</h2>
+
+    <input type="text" id="newUser" placeholder="Username">
+    <input type="password" id="newPass" placeholder="Password">
+
+    <button onclick="signup()">Sign Up</button>
+    <p id="error" class="error"></p>
+
+    <p style="margin-top:15px; font-size:14px;">
+        Already have an account?
+        <a href="login.html" style="color:#3FA9F5; text-decoration:none;">Login</a>
+    </p>
+</div>
+
+<script>
+function signup() {
+
+    const user = document.getElementById("newUser").value.trim();
+    const pass = document.getElementById("newPass").value.trim();
+
+    if (!user || !pass) {
+        document.getElementById("error").innerText = "All fields required!";
+        return;
+    }
+
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+
+    const userExists = users.find(u => u.username === user);
+
+    if (userExists) {
+        document.getElementById("error").innerText = "Username already exists!";
+        return;
+    }
+
+    users.push({ username: user, password: pass });
+    localStorage.setItem("users", JSON.stringify(users));
+
+    alert("Account created successfully!");
+    window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TrustPass – Smart Auto Fill Forms</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+    background: linear-gradient(135deg,#0B2C4A,#114E82);
+    color:white;
+    font-family:Segoe UI;
+    padding:40px 15px;
+}
+.card{
+    background:white;
+    color:#0B2C4A;
+    padding:25px;
+    border-radius:15px;
+    margin-top:20px;
+}
+.btn-premium{
+    background:#00e0ff;
+    border:none;
+}
+.btn-premium:hover{
+    background:#00bcd4;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h3 class="text-center mb-4">📄 Smart Auto-Fill Forms</h3>
+
+<div class="card text-center">
+<h5>Select Form</h5>
+
+<div class="form-check">
+<input type="radio" name="formSelect" value="bank" checked class="form-check-input">
+<label class="form-check-label">Bank Account Opening</label>
+</div>
+
+<div class="form-check">
+<input type="radio" name="formSelect" value="loan" class="form-check-input">
+<label class="form-check-label">Loan Application</label>
+</div>
+
+<div class="form-check">
+<input type="radio" name="formSelect" value="college" class="form-check-input">
+<label class="form-check-label">College Application</label>
+</div>
+
+<button class="btn btn-premium mt-3" onclick="openForm()">Open Form</button>
+</div>
+
+<!-- ================= BANK ================= -->
+<div class="card" id="bankForm" style="display:none;">
+<h5>Bank Account Opening</h5>
+
+<input class="form-control mb-2" id="fullName" placeholder="Full Name">
+<input type="date" class="form-control mb-2" id="dob">
+<select class="form-select mb-2" id="gender">
+<option value="">Gender</option>
+<option>Male</option>
+<option>Female</option>
+<option>Other</option>
+</select>
+<input class="form-control mb-2" id="mobile" placeholder="Mobile">
+<input class="form-control mb-2" id="email" placeholder="Email">
+<textarea class="form-control mb-2" id="currentAddress" placeholder="Address"></textarea>
+<input class="form-control mb-2" id="city" placeholder="City">
+<input class="form-control mb-2" id="state" placeholder="State">
+<input class="form-control mb-2" id="pincode" placeholder="Pincode">
+<input class="form-control mb-2" id="panNumber" placeholder="PAN Number">
+<input class="form-control mb-2" id="aadhaarNumber" placeholder="Aadhaar Number">
+
+<button class="btn btn-premium mt-2" onclick="autoFill()">Auto-Fill</button>
+</div>
+
+<!-- ================= LOAN ================= -->
+<div class="card" id="loanForm" style="display:none;">
+<h5>Loan Application</h5>
+
+<input class="form-control mb-2" id="fullName" placeholder="Full Name">
+<input class="form-control mb-2" id="mobile" placeholder="Mobile">
+<input class="form-control mb-2" id="email" placeholder="Email">
+<input class="form-control mb-2" id="panNumber" placeholder="PAN Number">
+<input class="form-control mb-2" id="aadhaarNumber" placeholder="Aadhaar Number">
+<input class="form-control mb-2" id="occupation" placeholder="Occupation">
+<input class="form-control mb-2" id="incomeRange" placeholder="Income Range">
+
+<button class="btn btn-premium mt-2" onclick="autoFill()">Auto-Fill</button>
+</div>
+
+<!-- ================= COLLEGE ================= -->
+<div class="card" id="collegeForm" style="display:none;">
+<h5>College Application</h5>
+
+<input class="form-control mb-2" id="fullName" placeholder="Full Name">
+<input type="date" class="form-control mb-2" id="dob">
+<input class="form-control mb-2" id="mobile" placeholder="Mobile">
+<input class="form-control mb-2" id="email" placeholder="Email">
+<input class="form-control mb-2" id="tenthMarks" placeholder="10th Percentage">
+<input class="form-control mb-2" id="twelfthMarks" placeholder="12th Percentage">
+<input class="form-control mb-2" id="examName" placeholder="Entrance Exam">
+<input class="form-control mb-2" id="examRank" placeholder="Entrance Rank">
+<input class="form-control mb-2" id="category" placeholder="Category">
+
+<button class="btn btn-premium mt-2" onclick="autoFill()">Auto-Fill</button>
+</div>
+
+</div>
+
+<script>
+
+/* ===== OPEN FORM ===== */
+function openForm(){
+let selected=document.querySelector('input[name="formSelect"]:checked').value;
+
+document.getElementById("bankForm").style.display="none";
+document.getElementById("loanForm").style.display="none";
+document.getElementById("collegeForm").style.display="none";
+
+if(selected==="bank") document.getElementById("bankForm").style.display="block";
+if(selected==="loan") document.getElementById("loanForm").style.display="block";
+if(selected==="college") document.getElementById("collegeForm").style.display="block";
+}
+
+/* ===== DECRYPT ===== */
+function decrypt(data){ return JSON.parse(atob(data)); }
+
+/* ===== AUTO FILL WITH CONSENT CHECK ===== */
+function autoFill(){
+
+let encrypted=localStorage.getItem("secureVault");
+
+if(!encrypted){
+alert("No Vault Found!");
+return;
+}
+
+let vault=decrypt(encrypted);
+let data=vault.data;
+let consent=vault.consent;
+
+for(let key in data){
+
+if(consent["consent_"+key]===true){
+let elements=document.querySelectorAll("#bankForm [id='"+key+"'], #loanForm [id='"+key+"'], #collegeForm [id='"+key+"']");
+elements.forEach(el=>{
+if(el) el.value=data[key];
+});
+}
+
+}
+
+alert("Auto-Fill Completed ✅");
+}
+</script>
+<h5>⏱ Time Spent: <span id="timer">0</span> seconds</h5>
+<form action="audit.html" 
+      onsubmit="stopTimer()" 
+      style="text-align: center; margin-top: 20px;">
+  <button type="submit">Submit</button>
+</form>
+<script>
+let seconds = 0;
+let timerInterval;
+
+// Start timer when page loads
+window.onload = function() {
+    timerInterval = setInterval(function() {
+        seconds++;
+        document.getElementById("timer").innerText = seconds;
+    }, 1000);
+};
+
+function stopTimer() {
+    clearInterval(timerInterval);
+    localStorage.setItem("formTime", seconds + " seconds");
+}
+</script>
+</body>
+</html>
